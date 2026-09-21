@@ -1,0 +1,135 @@
+{
+  "date": "2026-09-21T00:18:30.324Z",
+  "environment": "Node canvas (@napi-rs/canvas); 실제 브라우저 검사는 별도 기록",
+  "tests": [
+    {
+      "id": "E01",
+      "input": "긴 한글 2,000자",
+      "expected": "전체 문구가 안전 영역 안에 배치",
+      "result": "PASS",
+      "actual": {
+        "fontSize": 19,
+        "lines": 37,
+        "height": 949.0500000000001
+      }
+    },
+    {
+      "id": "E02",
+      "input": "한글 English 123 혼합 1,950자",
+      "expected": "자동 줄바꿈 및 높이 보존",
+      "result": "PASS",
+      "actual": {
+        "fontSize": 26,
+        "lines": 26,
+        "height": 912.6
+      }
+    },
+    {
+      "id": "E03",
+      "input": "첫째 줄\n\n셋째 줄",
+      "expected": "빈 줄 포함 3줄 유지",
+      "result": "PASS",
+      "actual": "3줄 유지"
+    },
+    {
+      "id": "E04",
+      "input": "가족 👨‍👩‍👧‍👦 / 👍🏽 / 🇰🇷",
+      "expected": "이모지 결합문자 분리 없음",
+      "result": "PASS",
+      "actual": [
+        "👨‍👩‍👧‍👦",
+        "👍🏽",
+        "🇰🇷"
+      ]
+    },
+    {
+      "id": "E05",
+      "input": "빈 문구",
+      "expected": "오류 없이 배경 유지",
+      "result": "PASS",
+      "actual": {
+        "fontSize": 78,
+        "lines": 1,
+        "height": 105.30000000000001
+      }
+    },
+    {
+      "id": "E06",
+      "input": "portrait PNG",
+      "expected": "이미지 비율 유지, cover/contain 양쪽 렌더 성공",
+      "result": "PASS",
+      "actual": {
+        "width": 240,
+        "height": 960
+      }
+    },
+    {
+      "id": "E07",
+      "input": "landscape PNG",
+      "expected": "이미지 비율 유지, cover/contain 양쪽 렌더 성공",
+      "result": "PASS",
+      "actual": {
+        "width": 960,
+        "height": 240
+      }
+    },
+    {
+      "id": "E08",
+      "input": "transparent PNG",
+      "expected": "이미지 비율 유지, cover/contain 양쪽 렌더 성공",
+      "result": "PASS",
+      "actual": {
+        "width": 600,
+        "height": 600
+      }
+    },
+    {
+      "id": "E09",
+      "input": "JPEG 실제 바이트",
+      "expected": "JPEG 인식 및 디코딩 성공",
+      "result": "PASS",
+      "actual": "960×240"
+    },
+    {
+      "id": "E10",
+      "input": "가짜 PNG (텍스트 파일)",
+      "expected": "거부 및 기존 편집 상태 불변",
+      "result": "PASS",
+      "actual": "PNG·JPEG 형식 오류로 거부"
+    },
+    {
+      "id": "E11",
+      "input": "손상 JSON / 필수 항목 누락",
+      "expected": "저장 전 전체 거부",
+      "result": "PASS",
+      "actual": "2종 모두 거부"
+    },
+    {
+      "id": "E12",
+      "input": "한글 한 글자 + 줄바꿈 1,999개",
+      "expected": "극단 줄바꿈에서도 영역 높이 이내",
+      "result": "FAIL",
+      "actual": "The expression evaluated to a falsy value:\n\n  assert(l.top+l.height<=h-54+.01)\n"
+    }
+  ],
+  "roundtrips": [
+    {
+      "ratio": "1:1",
+      "width": 1080,
+      "height": 1080,
+      "pixelIdentical": true
+    },
+    {
+      "ratio": "4:5",
+      "width": 1080,
+      "height": 1350,
+      "pixelIdentical": true
+    },
+    {
+      "ratio": "9:16",
+      "width": 1080,
+      "height": 1920,
+      "pixelIdentical": true
+    }
+  ]
+}
