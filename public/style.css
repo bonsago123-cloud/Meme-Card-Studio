@@ -22,3 +22,5 @@
 .crop-heading strong{font-size:11px;color:#4f4560}
 .crop-heading span{font-size:9px;color:#9a94a3;text-align:right}
 .crop-grid input:disabled,#imageScale:disabled{opacity:.4;cursor:not-allowed}
+
+.crop-status{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:8px 0 12px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#faf9fc;font-size:10px;color:#756b82}.crop-status span{display:flex;justify-content:space-between;gap:8px}.crop-status b{color:var(--purple);font-weight:700}.edit-modes{flex-wrap:wrap}
