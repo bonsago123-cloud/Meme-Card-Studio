@@ -18,15 +18,20 @@ export function canvasDimensions(s){if((s.photoCanvas||s.canvasEnabled===false)&
 export function setCanvasRatio(s,ratio){
  if(!['1:1','4:5','9:16'].includes(ratio))throw Error('Invalid ratio');
  s.ratio=ratio;
- const p=s.photo;
- if(s.applyPhotoRatio===false)return;
- if(p&&s.keepAspect){
-  const [rw,rh]=ratio.split(':').map(Number),target=rw/rh;
-  const old={...p};
+ // A regular canvas owns its dimensions. Changing it must not modify photo geometry.
+ if(s.canvasEnabled!==false&&!s.photoCanvas)return;
+ const p=s.photo;if(!p)return;
+ if(s.keepAspect){
+  const [rw,rh]=ratio.split(':').map(Number),target=rw/rh,old={...p};
   const w=Math.min(old.w,old.h*target),h=Math.min(old.h,old.w/target);
   const dx=(old.w-w)/2,dy=(old.h-h)/2;
   Object.assign(p,{sx:old.sx+dx/old.w*old.sw,sy:old.sy+dy/old.h*old.sh,sw:old.sw*w/old.w,sh:old.sh*h/old.h,w,h,x:old.x+dx,y:old.y+dy});
-  if(s.photoCanvas){p.x=0;p.y=0;}
- }else if(p&&(s.photoCanvas||s.applyPhotoRatio===true)){const w=1080,h=ratio==='1:1'?1080:ratio==='4:5'?1350:1920;Object.assign(p,{x:s.photoCanvas?0:p.x+(p.w-w)/2,y:s.photoCanvas?0:p.y+(p.h-h)/2,w,h});}
-
+ }else{
+  const w=1080,h=ratio==='1:1'?1080:ratio==='4:5'?1350:1920;
+  Object.assign(p,{x:p.x+(p.w-w)/2,y:p.y+(p.h-h)/2,w,h});
+ }
+ if(s.photoCanvas){p.x=0;p.y=0;}
 }
+export function outputRect(s){const [w,h]=canvasDimensions(s);return {x:s.canvasEnabled===false&&s.photo?s.photo.x:0,y:s.canvasEnabled===false&&s.photo?s.photo.y:0,w,h};}
+export function sceneRect(s){const a=outputRect(s),p=s.photo;if(!p)return a;const x=Math.min(a.x,p.x),y=Math.min(a.y,p.y);return{x,y,w:Math.max(a.x+a.w,p.x+p.w)-x,h:Math.max(a.y+a.h,p.y+p.h)-y};}
+export function checkedExportSize(w,h){w=Math.max(1,Math.round(w));h=Math.max(1,Math.round(h));if(!Number.isSafeInteger(w)||!Number.isSafeInteger(h)||w*h>40000000)throw Error('저장 영역이 너무 큽니다. 사진 크기를 줄여 주세요. 편집은 유지됩니다.');return [w,h];}

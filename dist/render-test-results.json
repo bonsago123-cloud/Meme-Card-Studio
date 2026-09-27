@@ -1,0 +1,20 @@
+{
+  "scope": "Actual renderer and framing functions with recording substitutes; not browser pixel verification",
+  "tests": [
+    {
+      "ratio": "1:1",
+      "result": "PASS: preview/export same render calls, including clip/image/text"
+    },
+    {
+      "ratio": "4:5",
+      "result": "PASS: preview/export same render calls, including clip/image/text"
+    },
+    {
+      "ratio": "9:16",
+      "result": "PASS: preview/export same render calls, including clip/image/text"
+    },
+    {
+      "result": "PASS: frameOutput centers tall canvas, ignoring displaced photo"
+    }
+  ]
+}
