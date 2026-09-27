@@ -1,0 +1,3 @@
+moment 1080 1080 PASS decoded; EXIF/XMP/IPTC absent
+yours 1080 1350 PASS decoded; EXIF/XMP/IPTC absent
+today 1080 1920 PASS decoded; EXIF/XMP/IPTC absent
