@@ -10,7 +10,7 @@ export function resizeRect(r,handle,dx,dy,lock=false){
  return {x:clamp(l,-5000,5000),y:clamp(t,-5000,5000),w:clamp(w,0.001,10000),h:clamp(h,0.001,10000)};
 }
 export function cropRect(r,h,dx,dy,bounds){const mw=Math.min(24,bounds.w),mh=Math.min(24,bounds.h);let q=resizeRect(r,h,dx,dy,false);const l=clamp(q.x,bounds.x,bounds.x+bounds.w-mw),t=clamp(q.y,bounds.y,bounds.y+bounds.h-mh);const rr=clamp(q.x+q.w,l+mw,bounds.x+bounds.w),bb=clamp(q.y+q.h,t+mh,bounds.y+bounds.h);return{x:l,y:t,w:rr-l,h:bb-t};}
-export function validState(s){const num=(v,a,b)=>typeof v==='number'&&Number.isFinite(v)&&v>=a&&v<=b;const color=v=>typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v);if(!s||!['1:1','4:5','9:16'].includes(s.ratio)||!color(s.background)||!color(s.textColor)||typeof s.text!=='string'||s.text.length>1500||!num(s.fontSize,16,160)||!num(s.textX,0,100)||!num(s.textY,0,100)||!['quiet','bold','note'].includes(s.design))return false;if(s.keepAspect!==undefined&&typeof s.keepAspect!=='boolean')return false;if(s.canvasEnabled!==undefined&&typeof s.canvasEnabled!=='boolean')return false;if(s.photoCanvas!==undefined&&typeof s.photoCanvas!=='boolean')return false;if(s.photoCanvas&&(!s.photo||s.canvasEnabled===false))return false;if(s.photo!==null){const p=s.photo;if(!p||typeof p.src!=='string'||!/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(p.src)||p.src.length>29000000)return false;for(const k of ['x','y'])if(!num(p[k],-5000,5000))return false;for(const k of ['w','h'])if(!num(p[k],0.001,10000))return false;for(const k of ['sx','sy'])if(!num(p[k],0,12000))return false;for(const k of ['sw','sh'])if(!num(p[k],0.001,12000))return false;}return true;}
+export function validState(s){const num=(v,a,b)=>typeof v==='number'&&Number.isFinite(v)&&v>=a&&v<=b;const color=v=>typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v);if(!s||!['1:1','4:5','9:16'].includes(s.ratio)||!color(s.background)||!color(s.textColor)||typeof s.text!=='string'||s.text.length>1500||!num(s.fontSize,16,160)||!num(s.textX,0,100)||!num(s.textY,0,100)||!['quiet','bold','note'].includes(s.design))return false;if(s.applyPhotoRatio!==undefined&&typeof s.applyPhotoRatio!=='boolean')return false;if(s.keepAspect!==undefined&&typeof s.keepAspect!=='boolean')return false;if(s.canvasEnabled!==undefined&&typeof s.canvasEnabled!=='boolean')return false;if(s.photoCanvas!==undefined&&typeof s.photoCanvas!=='boolean')return false;if(s.photoCanvas&&(!s.photo||s.canvasEnabled===false))return false;if(s.photo!==null){const p=s.photo;if(!p||typeof p.src!=='string'||!/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(p.src)||p.src.length>29000000)return false;for(const k of ['x','y'])if(!num(p[k],-5000,5000))return false;for(const k of ['w','h'])if(!num(p[k],0.001,10000))return false;for(const k of ['sx','sy'])if(!num(p[k],0,12000))return false;for(const k of ['sw','sh'])if(!num(p[k],0.001,12000))return false;}return true;}
 export function validateBundle(value){if(!value||value.version!==1||!Array.isArray(value.templates)||value.templates.length>100)throw Error('템플릿 JSON 형식이 올바르지 않습니다.');const ids=new Set;for(const t of value.templates){if(!t||typeof t.id!=='string'||!t.id||ids.has(t.id)||typeof t.name!=='string'||!t.name.trim()||t.name.length>60||!validState(t.state))throw Error('필수 항목이 없거나 잘못된 템플릿이 있습니다.');ids.add(t.id);}return value.templates;}
 export function wrapText(text,maxWidth,measure){const graphemes=s=>typeof Intl.Segmenter==='function'?[...new Intl.Segmenter('ko',{granularity:'grapheme'}).segment(s)].map(x=>x.segment):Array.from(s);return text.split('\n').flatMap(p=>{let lines=[],line='';for(const ch of graphemes(p)){if(line&&measure(line+ch)>maxWidth){lines.push(line);line=ch;}else line+=ch;}lines.push(line);return lines;});}
 
@@ -19,6 +19,7 @@ export function setCanvasRatio(s,ratio){
  if(!['1:1','4:5','9:16'].includes(ratio))throw Error('Invalid ratio');
  s.ratio=ratio;
  const p=s.photo;
+ if(s.applyPhotoRatio===false)return;
  if(p&&s.keepAspect){
   const [rw,rh]=ratio.split(':').map(Number),target=rw/rh;
   const old={...p};
@@ -26,6 +27,6 @@ export function setCanvasRatio(s,ratio){
   const dx=(old.w-w)/2,dy=(old.h-h)/2;
   Object.assign(p,{sx:old.sx+dx/old.w*old.sw,sy:old.sy+dy/old.h*old.sh,sw:old.sw*w/old.w,sh:old.sh*h/old.h,w,h,x:old.x+dx,y:old.y+dy});
   if(s.photoCanvas){p.x=0;p.y=0;}
- }else if(s.photoCanvas&&p){Object.assign(p,{x:0,y:0,w:1080,h:ratio==='1:1'?1080:ratio==='4:5'?1350:1920});}
- if(!s.photoCanvas)s.canvasEnabled=true;
+ }else if(p&&(s.photoCanvas||s.applyPhotoRatio===true)){const w=1080,h=ratio==='1:1'?1080:ratio==='4:5'?1350:1920;Object.assign(p,{x:s.photoCanvas?0:p.x+(p.w-w)/2,y:s.photoCanvas?0:p.y+(p.h-h)/2,w,h});}
+
 }

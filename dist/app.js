@@ -1,17 +1,17 @@
 import {clamp,resizeRect,cropRect,validState,validateBundle,wrapText,canvasDimensions,setCanvasRatio} from './core.mjs';
 const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d'),stage=$('stage');
-const initial={ratio:'1:1',background:'#e9e4db',text:'오늘의 작은 순간을\n오래 기억하기',textColor:'#ffffff',fontSize:64,textX:50,textY:72,design:'quiet',photo:null,canvasEnabled:true,photoCanvas:false,keepAspect:false};
+const initial={ratio:'1:1',background:'#e9e4db',text:'오늘의 작은 순간을\n오래 기억하기',textColor:'#ffffff',fontSize:64,textX:50,textY:72,design:'quiet',photo:null,canvasEnabled:true,photoCanvas:false,keepAspect:false,applyPhotoRatio:false};
 let state=structuredClone(initial),mode='size',crop=null,image=null,history=[],templates=[],selected=null,drag=null,textBox=null,uploadSerial=0;
 const notice=(s,error=false)=>{$('notice').textContent=s;$('notice').classList.toggle('error',error);};
 const snapshot=()=>{history.push(structuredClone(state));if(history.length>30)history.shift();$('undo').disabled=false;};
 const dimensions=()=>canvasDimensions(state);
 function isPhotoSurface(){return !!state.photo&&(state.photoCanvas||state.canvasEnabled===false);}
 function normalizeSurface(){if(isPhotoSurface()){state.photo.x=0;state.photo.y=0;}}
-function canvasControls(){const empty=state.canvasEnabled===false&&!state.photo;$('photoCanvas').checked=!!state.photoCanvas;$('photoCanvas').disabled=!state.photo;$('addCanvas').disabled=state.canvasEnabled!==false;$('deleteCanvas').disabled=state.canvasEnabled===false;$('download').disabled=empty;$('downloadPhoto').disabled=!state.photo;$('emptyCanvas').hidden=!empty;stage.hidden=empty;$('background').disabled=state.canvasEnabled===false||!!state.photoCanvas;document.querySelectorAll('[data-ratio]').forEach(b=>{const [w,h]=dimensions();const [rw,rh]=b.dataset.ratio.split(':').map(Number);b.classList.toggle('selected',!empty&&Math.abs(w/h-rw/rh)<.002);});}
+function canvasControls(){const empty=state.canvasEnabled===false&&!state.photo;$('photoCanvas').checked=!!state.photoCanvas;$('photoCanvas').disabled=!state.photo;$('hideCanvas').checked=state.canvasEnabled===false;$('applyPhotoRatio').checked=!!state.applyPhotoRatio;$('download').disabled=empty;$('downloadPhoto').disabled=!state.photo;$('deletePhoto').disabled=!state.photo;$('emptyCanvas').hidden=!empty;stage.hidden=empty;$('background').disabled=state.canvasEnabled===false||!!state.photoCanvas;document.querySelectorAll('[data-ratio]').forEach(b=>{const [w,h]=dimensions();const [rw,rh]=b.dataset.ratio.split(':').map(Number);b.classList.toggle('selected',!empty&&Math.abs(w/h-rw/rh)<.002);});}
 $('lock').onchange=()=>{snapshot();state.keepAspect=$('lock').checked;notice(state.keepAspect?'비율 변경 시 사진을 늘리지 않고 가운데 기준으로 자릅니다.':'비율 유지가 해제됐어요.');};
-$('photoCanvas').onchange=()=>{if(!state.photo)return;snapshot();state.photoCanvas=$('photoCanvas').checked;if(state.photoCanvas){state.canvasEnabled=true;normalizeSurface();}setMode('size');sync();notice(state.photoCanvas?'사진 크기를 캔버스로 사용합니다. 비율 버튼으로 사진 비율을 바꿀 수 있어요.':'사진과 캔버스를 따로 편집합니다.');};
-$('deleteCanvas').onclick=()=>{snapshot();state.canvasEnabled=false;state.photoCanvas=false;normalizeSurface();setMode('size');sync();notice('캔버스 배경을 삭제했어요. 사진과 문구는 유지되며, PNG는 투명 배경으로 저장됩니다.');};
-$('addCanvas').onclick=()=>{snapshot();state.canvasEnabled=true;state.photoCanvas=false;setMode('size');sync();notice('캔버스를 추가했어요. 사진과 문구는 유지됩니다.');};
+$('photoCanvas').onchange=()=>{if(!state.photo)return;snapshot();state.photoCanvas=$('photoCanvas').checked;if(state.photoCanvas){state.canvasEnabled=true;normalizeSurface();}setMode('size');sync();notice(state.photoCanvas?'사진 크기를 캔버스로 사용합니다. 사진 비율 변경은 ‘사진에 적용’을 체크하세요.':'사진과 캔버스를 따로 편집합니다.');};
+$('hideCanvas').onchange=()=>{snapshot();state.canvasEnabled=!$('hideCanvas').checked;state.photoCanvas=false;setMode('size');sync();notice(state.canvasEnabled?'캔버스가 다시 나타났어요.':'캔버스를 숨겼어요. 사진과 문구는 유지됩니다.');};
+$('applyPhotoRatio').onchange=()=>{snapshot();state.applyPhotoRatio=$('applyPhotoRatio').checked;notice(state.applyPhotoRatio?'다음 비율 변경부터 사진에도 적용됩니다.':'사진에 적용을 해제했어요. 이미 편집한 사진은 그대로 유지됩니다.');};
 function sync(){$('lock').checked=!!state.keepAspect;for(const k of ['background','text','fontSize','textColor','textX','textY'])$(k).value=state[k];$('fontSizeOut').textContent=state.fontSize;document.querySelectorAll('[data-ratio]').forEach(b=>b.classList.toggle('selected',b.dataset.ratio===state.ratio));$('undo').disabled=!history.length;draw();}
 function typography(c,w,h){if(state.photo||state.canvasEnabled===false)return;c.save();c.textAlign='center';if(state.design==='quiet'){let g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,state.background);g.addColorStop(1,'#a09c8f');c.fillStyle=g;c.fillRect(0,0,w,h);c.fillStyle='#ffffffb0';c.font='500 18px sans-serif';c.fillText('M O M E N T S   T O   K E E P',w/2,h*.13);c.strokeStyle='#ffffff55';c.beginPath();c.moveTo(w*.43,h*.2);c.lineTo(w*.57,h*.2);c.stroke();c.fillStyle='#ffffff';c.font='italic 110px Georgia, serif';c.fillText('a little',w/2,h*.39);c.fillText('moment.',w/2,h*.51);}else if(state.design==='bold'){c.fillStyle=state.textColor;c.font='900 150px sans-serif';c.fillText('MAKE',w/2,h*.28);c.fillText('IT YOURS.',w/2,h*.43);}else{c.strokeStyle='#5a654a33';c.strokeRect(55,55,w-110,h-110);c.fillStyle=state.textColor;c.font='italic 90px Georgia';c.fillText('Dear, today',w/2,h*.3);}c.restore();}
 function render(c,w,h){c.clearRect(0,0,w,h);if((state.canvasEnabled!==false&&!state.photoCanvas)||$('format').value==='jpeg'){c.fillStyle=state.background;c.fillRect(0,0,w,h);}typography(c,w,h);if(image&&state.photo){let p=state.photo;c.drawImage(image,p.sx,p.sy,p.sw,p.sh,p.x,p.y,p.w,p.h);}c.save();c.textAlign='center';c.textBaseline='top';c.fillStyle=state.textColor;let size=state.fontSize,lines;const maxWidth=w*.88,maxHeight=h*.88;do{c.font=`700 ${size}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;lines=wrapText(state.text,maxWidth,t=>c.measureText(t).width);if(lines.length*size*1.35<=maxHeight)break;size-=1;}while(size>8);const lineH=size*1.35,bw=Math.min(maxWidth,Math.max(1,...lines.map(l=>c.measureText(l).width))),bh=state.text?lines.length*lineH:0;const x=clamp(state.textX/100*w,bw/2+12,w-bw/2-12),y=clamp(state.textY/100*h-bh/2,12,h-bh-12);lines.forEach((l,i)=>c.fillText(l,x,y+i*lineH));textBox={x:x-bw/2,y,w:bw,h:bh};c.restore();}
@@ -31,6 +31,24 @@ async function cleanImage(file){if(!file||!['image/png','image/jpeg'].includes(f
 function fitPhoto(){if(!state.photo)return;let p=state.photo;if(isPhotoSurface()){p.w=p.sw;p.h=p.sh;p.x=0;p.y=0;if(mode==='crop')crop=pickRect(p);draw();return;}const s=Math.min(canvas.width/p.sw,canvas.height/p.sh);p.w=p.sw*s;p.h=p.sh*s;p.x=(canvas.width-p.w)/2;p.y=(canvas.height-p.h)/2;if(mode==='crop')crop=pickRect(p);draw();}
 $('imageFile').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;const serial=++uploadSerial;try{const img=await cleanImage(file);if(serial!==uploadSerial)return;snapshot();image=img;state.photo={src:img.src,sx:0,sy:0,sw:img.width,sh:img.height,x:0,y:0,w:img.width,h:img.height};fitPhoto();setMode('size');notice('사진을 불러왔어요. 테두리와 꼭짓점을 드래그해 보세요.');}catch(err){notice(err.message,true);}};
 $('format').onchange=()=>draw();
+function deletePhoto(){
+ if(!state.photo)return;
+ snapshot();
+ ++uploadSerial;
+ state.photo=null;
+ state.photoCanvas=false;
+ image=null;crop=null;drag=null;
+ $('imageFile').value='';
+ setMode('size');sync();
+ notice('사진을 삭제했어요. 되돌리기를 누르면 복구할 수 있습니다.');
+}
+$('deletePhoto').onclick=deletePhoto;
+document.addEventListener('keydown',e=>{
+ if(e.key!=='Delete'||e.defaultPrevented||e.isComposing||e.repeat||e.ctrlKey||e.altKey||e.metaKey||e.shiftKey)return;
+ const editing=e.composedPath().some(node=>node?.isContentEditable||node?.matches?.('input, textarea, select, [role="textbox"]'));
+ if(editing||!state.photo)return;
+ e.preventDefault();deletePhoto();
+});
 $('sizeTab').onclick=()=>setMode('size');$('cropTab').onclick=()=>setMode('crop');$('applyCrop').onclick=()=>applyCrop();$('cancelCrop').onclick=()=>setMode('size');$('fit').onclick=()=>{if(state.photo){snapshot();fitPhoto();}};$('resetImage').onclick=()=>{if(!state.photo)return;snapshot();Object.assign(state.photo,{sx:0,sy:0,sw:image.width,sh:image.height});fitPhoto();notice('원본 영역으로 복구했어요.');};
 $('undo').onclick=async()=>{if(!history.length)return;const previous=history[history.length-1];try{const img=previous.photo?await loadImage(previous.photo.src):null;history.pop();state=previous;image=img;setMode('size');sync();notice('이전 편집으로 되돌렸어요.');}catch(e){notice(e.message,true);}};
 for(const k of ['background','text','fontSize','textColor','textX','textY']){$(k).addEventListener('focus',()=>snapshot());$(k).oninput=()=>{state[k]=['fontSize','textX','textY'].includes(k)?Number($(k).value):$(k).value;$('fontSizeOut').textContent=state.fontSize;draw();};}
