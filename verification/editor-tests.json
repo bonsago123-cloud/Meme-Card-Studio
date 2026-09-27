@@ -1,0 +1,98 @@
+{
+  "scope": "Node: actual app handlers with DOM/canvas/IndexedDB substitutes; not real browser or pixel-level verification",
+  "total": 23,
+  "tests": [
+    {
+      "name": "구버전 사진·문구·사진 캔버스 보존",
+      "result": "PASS"
+    },
+    {
+      "name": "다중 사진·폰트·문구·쉐이딩 JSON 왕복",
+      "result": "PASS"
+    },
+    {
+      "name": "잘못된 배열·중복 ID·폰트·쉐이딩·참조 거부",
+      "result": "PASS"
+    },
+    {
+      "name": "일반 캔버스 비율 변경 시 모든 사진 위치·크기 유지",
+      "result": "PASS"
+    },
+    {
+      "name": "사진 캔버스 비율 변경은 지정 사진만 변경",
+      "result": "PASS"
+    },
+    {
+      "name": "캔버스 삭제 시 한 장 자유 이동과 다중 사진 영역",
+      "result": "PASS"
+    },
+    {
+      "name": "캔버스 삭제·사진 캔버스에는 색과 쉐이딩 호출 없음",
+      "result": "PASS"
+    },
+    {
+      "name": "사진 여러 장 추가 및 잘못된 일괄 업로드 원자적 거부",
+      "result": "PASS"
+    },
+    {
+      "name": "문구 추가와 선택된 문구 폰트·색 독립 편집",
+      "result": "PASS"
+    },
+    {
+      "name": "삭제 버튼·Delete 선택 항목만 삭제, 입력 중 Delete는 보존, 되돌리기 복구",
+      "result": "PASS"
+    },
+    {
+      "name": "선택된 사진 상단 드래그는 높이만 변경",
+      "result": "PASS"
+    },
+    {
+      "name": "멀리 나간 사진 반투명 요소 표시 및 다시 드래그",
+      "result": "PASS"
+    },
+    {
+      "name": "캔버스 삭제 후 기존 한 장의 자유 드래그 유지",
+      "result": "PASS"
+    },
+    {
+      "name": "사진 캔버스 지정은 다른 항목 선택 후에도 유지·배경 편집 차단",
+      "result": "PASS"
+    },
+    {
+      "name": "선택 사진만 자르기 적용",
+      "result": "PASS"
+    },
+    {
+      "name": "3개 템플릿 생성·수정·삭제·불러오기 및 JSON 복원",
+      "result": "PASS"
+    },
+    {
+      "name": "세 비율 다중 사진·다중 문구 미리보기/저장 렌더 호출 일치",
+      "result": "PASS"
+    },
+    {
+      "name": "극단 문구 5종 및 빈 문구 렌더 보존",
+      "result": "PASS"
+    },
+    {
+      "name": "템플릿의 모든 고정 문구를 일반 문구로 생성",
+      "result": "PASS"
+    },
+    {
+      "name": "Dear today 편집·글꼴 적용·삭제 후 저장/복원 시 부활 방지",
+      "result": "PASS"
+    },
+    {
+      "name": "기존 템플릿의 고정 글자 1회 변환 및 기존 문구 보존",
+      "result": "PASS"
+    },
+    {
+      "name": "템플릿 글꼴의 기울임·굵기 렌더 지정",
+      "result": "PASS"
+    },
+    {
+      "name": "비율 유지 체크박스와 이벤트 제거·불러온 잠금 설정 무효화",
+      "result": "PASS"
+    }
+  ]
+}

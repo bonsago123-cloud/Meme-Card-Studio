@@ -1,0 +1,4 @@
+{
+  "scope": "Runtime JS/MJS/HTML only; common credential patterns. Not deployed environment or git history.",
+  "findings": []
+}
