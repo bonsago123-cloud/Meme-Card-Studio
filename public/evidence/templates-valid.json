@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "preset-0",
+      "name": "나의 속도로",
+      "state": {
+        "text": "오늘도,\n나의 속도로.",
+        "ratio": "1:1",
+        "size": 78,
+        "color": "#ffffff",
+        "background": "#e7a58c",
+        "x": 50,
+        "y": 50,
+        "align": "center",
+        "shadow": true,
+        "fit": "cover",
+        "image": null,
+        "art": "peach"
+      }
+    },
+    {
+      "id": "preset-1",
+      "name": "밤의 문장",
+      "state": {
+        "text": "깊어지는 밤,\n선명해지는 생각.",
+        "ratio": "4:5",
+        "size": 72,
+        "color": "#ffffff",
+        "background": "#36326b",
+        "x": 50,
+        "y": 50,
+        "align": "center",
+        "shadow": true,
+        "fit": "cover",
+        "image": null,
+        "art": "night"
+      }
+    },
+    {
+      "id": "preset-2",
+      "name": "작은 시작",
+      "state": {
+        "text": "작은 시작이\n큰 변화를.",
+        "ratio": "9:16",
+        "size": 78,
+        "color": "#414b33",
+        "background": "#e0eb9c",
+        "x": 50,
+        "y": 50,
+        "align": "center",
+        "shadow": false,
+        "fit": "cover",
+        "image": null,
+        "art": "lime"
+      }
+    }
+  ]
+}

@@ -1,76 +1,82 @@
-# 모먼트 — Vercel 배포용 이미지 편집기
+# 짤·카드 스튜디오 — Vercel + Supabase
 
-Vercel만으로 실행하는 버전입니다. Supabase, 데이터베이스, API 키, 환경변수는 필요 없습니다.
-기존 사진 크기·자르기·이미지 저장·템플릿·JSON 백업 기능을 유지했습니다.
+기존 편집 기능을 유지하면서 Cloudflare D1/R2, vinext, Wrangler 의존성을 제거한 버전입니다.
 
-## 처음 배포하기
-1. 이 ZIP을 풀고, 안의 `vercel.json`, `dist`, `tests`, `README.md` 등을 **하나의 GitHub 저장소 최상위에** 올립니다. ZIP 자체를 업로드하면 웹사이트로 실행되지 않습니다. dist만 따로 저장소로 만들지 마세요.
-2. Vercel에서 Add New → Project → 해당 GitHub 저장소를 Import 합니다.
-3. Root Directory는 `vercel.json`이 있는 폴더로 지정하고 Deploy 합니다. 아래 설정은 vercel.json에 들어 있습니다.
+- Vercel: 공개 편집기와 Node.js 저장 API
+- Supabase Database: 브라우저별 보관함의 저장 위치와 버전
+- Supabase Storage: 이미지와 문구가 포함된 템플릿 JSON
+- 사용자 회원가입, Supabase Auth, CAPTCHA는 사용하지 않습니다.
+- 첫 방문 시 서버가 무작위 서명 쿠키를 발급합니다. 쿠키를 지우거나 다른 브라우저로 접속하면 별도 보관함입니다. 이전 사이트에서 새 주소로 옮길 때는 JSON 내보내기/가져오기를 사용하세요.
 
-| 항목 | 값 |
+## 가장 먼저
+
+**기존 프로젝트 폴더에 덮어쓰기만 하지 마세요.** 별도 폴더에 압축을 풀어 새 GitHub 저장소로 올리거나, 기존 저장소의 작업 폴더에서 `.git`을 제외한 이전 소스를 백업 후 이 묶음으로 교체하세요. 예전 `app/`, `vite.config.ts`, `pnpm-lock.yaml`, `.openai/`가 남으면 잘못된 프레임워크로 인식될 수 있습니다.
+
+상세 순서는 **DEPLOY-KO.md**를 따르세요.
+
+## 파일
+
+| 파일/폴더 | 역할 |
 |---|---|
-| Framework Preset | Other |
-| Root Directory | 저장소 최상위 (이 파일과 vercel.json이 있는 위치) |
-| Build Command | 빈칸 / 실행 안 함 |
-| Install Command | 빈칸 / 실행 안 함 |
-| Output Directory | dist |
-| Environment Variables | 필요 없음 |
+| `public/index.html`, `public/app.js`, `public/style.css` | 기존 편집 화면 |
+| `public/engine.mjs` | 공통 렌더링·JSON 검증 |
+| `public/storage.mjs` | Supabase 직접 전송과 저장 확인 |
+| `api/templates.js` | Vercel API 진입점 |
+| `server/` | 쿠키 검증·저장 처리·Supabase 연결 |
+| `supabase/setup.sql` | 테이블·버킷·원자적 저장 함수 생성 |
+| `vercel.json` | Vercel 빌드/출력 설정 |
+| `.env.example` | 필요한 환경변수 이름과 예시 |
+| `tests/` | 저장 실패·동시 수정·격리 검사 |
+| `public/evidence/` | 기존 편집기 검사와 완성 이미지 3개 |
 
-Vercel 공식 설정 문서: https://vercel.com/docs/project-configuration/vercel-json
+## 로컬 실행
 
-## 기존 Vercel 프로젝트를 바꾸는 경우
-- 기존 파일을 백업하고, 저장소의 앱 파일을 이 패키지로 교체합니다. 이전 Supabase용 api, SQL, package.json 등과 섞지 말고 이 ZIP의 구조로 맞춥니다.
-- Vercel에 지정한 Root Directory가 있다면 새 vercel.json이 있는 위치인지 확인합니다.
-- GitHub에 변경을 올린 뒤 새 배포를 기다립니다. Vercel에서 이전 빌드 설정이 남아 있다면 위 표와 맞춥니다.
-- 과제용 공개 URL은 로그인 없이 열려야 합니다. 실제 제출할 주소를 시크릿 창에서 확인하세요. 로그인 화면이 나오면 해당 프로젝트의 Deployment Protection 설정을 확인하세요.
+Node.js 22 이상을 사용하세요.
 
-## 사용 방법
-1. PNG/JPEG 사진을 불러옵니다.
-2. 크기 탭에서는 네 테두리와 네 꼭짓점을 드래그해 확대·축소합니다. 자르기 탭에서는 같은 위치를 드래그한 뒤 자르기 적용을 누릅니다.
-3. 사진만 저장은 사진을, 이미지 저장은 배경·문구를 합친 카드를 내려받습니다.
+```sh
+npm ci
+```
 
-## 템플릿 저장 방식
-- 템플릿은 같은 사이트 주소·같은 브라우저의 IndexedDB에 저장됩니다. 새로고침해도 유지됩니다.
-- 브라우저 데이터를 삭제하면 지워집니다. 기기 간 자동 동기화는 없습니다.
-- 기존 chatgpt.site나 다른 Vercel 주소에 저장한 템플릿은 새 주소에서 자동으로 보이지 않습니다. 이전 사이트에서 JSON 내보내기 → 새 사이트에서 JSON 가져오기로 옮기세요.
-- 비공개/시크릿 창의 저장 내용은 창을 닫으면 사라질 수 있습니다.
-- 서버로 사진을 업로드하지 않습니다. JSON 백업에는 사진과 문구가 포함됩니다.
+`.env.example`을 `.env.local`로 복사하고 Supabase 설정값을 입력한 뒤:
 
-## 유지한 기능
-- PNG/JPEG 업로드, 잘못된 파일 거부 시 기존 편집 유지
-- 8방향 크기 조절/자르기, 사진 이동, 비율 유지, 원본 복구, 되돌리기
-- 문구 위치·크기·색 조절, 긴 문구 줄바꿈
-- 1:1 / 4:5 / 9:16, PNG/JPEG 저장
-- 템플릿 생성·불러오기·수정·삭제 및 JSON 가져오기/내보내기
+```sh
+npm run dev
+```
 
-## 로컬 실행과 검증
-Python이 있다면 `python -m http.server 8000 --directory dist` 실행 후 http://localhost:8000 을 엽니다.
-HTML을 더블클릭해 file://로 열지 마세요. JavaScript 모듈이 차단될 수 있습니다.
-Node.js가 있다면 `node tests/check.mjs`로 13개 로직 검사를 실행할 수 있습니다.
-설정·파일 연결·자바스크립트 문법 및 로직 검사를 확인했습니다. 사용자의 Vercel 계정에 실제 배포하거나 실제 브라우저 동작을 검증한 것은 아닙니다.
-과제 체크 방법과 기존 검사 기록: dist/submission.html, dist/test-results.json, dist/regression.txt.
+`http://localhost:3000`을 엽니다. 설정값이 없어도 이미지 편집·다운로드는 사용할 수 있으며 서버 보관함은 설정 안내 오류를 표시합니다.
 
-예시 PNG는 이미 포함되어 있습니다. 예시 재생성 스크립트 scripts/make-samples.cjs는 별도 sharp 패키지가 있을 때만 사용하는 선택 도구이며 배포에는 필요 없습니다.
+```sh
+npm test
+npm run build
+```
 
-## 캔버스 편집 업데이트
-- 캔버스 추가/삭제: 하나의 배경 캔버스를 추가하거나 제거합니다. 삭제해도 사진과 문구 데이터는 유지되며, 되돌리기로 복구할 수 있습니다. 여러 페이지를 추가하는 기능은 아닙니다.
-- 사진 없이 캔버스를 삭제하면 빈 작업 공간이 표시되며, 캔버스 추가나 사진 업로드로 다시 편집합니다.
-- 위/아래 테두리는 높이만, 좌/우는 너비만 변합니다. 꼭짓점은 가로/세로를 함께 자유 변형하며, 비율 유지 체크는 꼭짓점에만 적용됩니다.
-- 사진을 캔버스로 사용 체크: 사진의 표시 크기 = 저장 크기. 사진 자체가 작업 영역이므로 사진 위치 이동은 하지 않고 문구 이동은 가능합니다.
-- 체크 상태에서 비율 버튼: 사진 전체를 1080×1080 / 1080×1350 / 1080×1920으로 맞춥니다. 사진을 잘라 채우는 방식이 아니라 가로·세로 비율을 변경하므로 모양이 길쭉해질 수 있습니다.
-- 체크 해제 후 비율 버튼: 캔버스만 변경하고 사진 크기는 유지합니다.
-- 체크 상태 및 캔버스 유무는 템플릿/JSON에 보존됩니다. 이전 버전 JSON도 불러올 수 있습니다.
-- 배경 없는 PNG는 투명 배경을 유지하며 JPEG는 선택한 배경색을 사용합니다. 형식을 바꾸면 미리보기에도 반영합니다.
+`dist/`에는 공개 파일만 복사합니다. 서버 소스·환경변수·SQL은 공개 출력에 들어가지 않습니다.
 
-## 과제 조건 대조
-추가 기능 자체를 금지하는 문구는 첨부 조건에 없습니다. 따라서 다음 조건을 유지하는 설계로 추가했습니다.
-- T03-C03: 캔버스를 삭제해도 사진·문구 편집 도구가 화면에 남습니다.
-- T03-C11~13: 1:1, 4:5, 9:16 비율 버튼 유지. 같은 render 함수를 미리보기와 합성 이미지 저장에 사용합니다.
-- T03-C09~10/C16: 명시적 캔버스 삭제와 잘못된 파일의 처리 경로를 구분합니다. 잘못된 입력 때문에 캔버스를 지우지 않습니다.
-- T03-C17~24: 기존 템플릿 CRUD/새로고침 유지/JSON 검증을 유지하며 새 선택 상태를 포함합니다.
-새 기능이 있다는 이유로 과제 위반은 아니지만, 과제 전체 통과를 확정하는 것은 아닙니다. 실제 브라우저에서 세 비율의 미리보기/저장 이미지 대조 및 공개 결과물·GitHub 전체 커밋 URL 확인은 여전히 필요합니다.
+## 저장 처리
 
-## 추가 검증
-`node tests/canvas-check.mjs`: 방향별 늘리기, 사진 캔버스, 세 비율 변경, 체크 해제 시 사진 보존, 삭제/복구 데이터, 새 JSON 및 기존 JSON 호환 등 11건 PASS.
-기존 13건과 합계 24건의 로직 검사 통과. 실제 브라우저 포인터 이벤트 및 렌더 화면 검사와는 구분합니다.
+1. Vercel은 현재 쿠키/저장 버전을 확인하고 임시 업로드 URL을 발급합니다.
+2. 브라우저가 이미지 포함 JSON을 Supabase로 직접 전송합니다(최대 20MiB).
+3. Vercel은 업로드된 JSON 전체를 검증하고 **다른 경로**에 확정 파일을 생성합니다.
+4. DB 함수가 현재 버전이 맞는 경우에만 보관함 포인터를 변경합니다. 기존 버전을 덮어쓰는 충돌은 거부합니다.
+
+서명 업로드 URL로 완료된 파일을 다시 바꿀 수 없도록 임시 경로와 확정 경로를 분리했습니다. 비밀 키는 서버 환경변수에서만 읽습니다. 공개 RLS 정책을 추가하지 마세요.
+
+파일 전송 후 브라우저를 닫으면 임시 파일이 남을 수 있습니다. 필요하면 Supabase Storage의 `card-studio/uploads`에서 24시간 이상 지난 임시 파일을 지우세요. **`collections` 폴더는 저장된 템플릿이므로 삭제하지 마세요.** 모든 사용자의 보관함은 같은 서버 서비스 계정이 관리하며, 사용자 구분은 서버가 서명한 쿠키로 이루어집니다.
+
+## 검사와 제출
+
+이번 저장 방식의 검사 범위는 `TEST-RESULTS.md`를 보세요. 기존 `public/evidence`의 브라우저 기록은 이전 배포에서 수행한 기록이며, 새 Supabase 계정으로 연결한 검사인 것처럼 제출하면 안 됩니다. 설정 후 템플릿 3개 생성 → 1개 수정 → 1개 삭제 → 새로고침 유지와 정상/손상 JSON 가져오기를 다시 확인하세요.
+
+제출 URL은 Vercel 공개 Production 주소와 공개 GitHub 전체 커밋 URL입니다. Vercel의 Deployment Protection이 켜져 로그인 화면이 나오면 해당 공개 배포의 보호를 해제한 뒤 시크릿 창에서 확인하세요.
+
+이전 사이트의 보관함은 자동 이전되지 않습니다. 이전 화면에서 JSON 내보내기 → 새 화면에서 JSON 가져오기로 옮기세요.
+
+## 참고한 공식 문서
+
+- https://vercel.com/docs/functions/limitations
+- https://vercel.com/docs/functions/runtimes/node-js
+- https://supabase.com/docs/guides/storage/uploads/standard-uploads
+- https://supabase.com/docs/guides/storage/security/access-control
+- https://supabase.com/docs/guides/getting-started/api-keys
+
+서비스 요금제나 결제 설정은 이 코드가 변경하지 않습니다.

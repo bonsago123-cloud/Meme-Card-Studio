@@ -1,0 +1,68 @@
+[
+  {
+    "file": "card-1.png",
+    "size": [
+      1080,
+      1080
+    ],
+    "metadata_keys": [
+      "srgb"
+    ],
+    "gps": false
+  },
+  {
+    "file": "portrait.png",
+    "size": [
+      240,
+      960
+    ],
+    "metadata_keys": [
+      "srgb"
+    ],
+    "gps": false
+  },
+  {
+    "file": "card-2.png",
+    "size": [
+      1080,
+      1350
+    ],
+    "metadata_keys": [
+      "srgb"
+    ],
+    "gps": false
+  },
+  {
+    "file": "landscape.png",
+    "size": [
+      960,
+      240
+    ],
+    "metadata_keys": [
+      "srgb"
+    ],
+    "gps": false
+  },
+  {
+    "file": "card-3.png",
+    "size": [
+      1080,
+      1920
+    ],
+    "metadata_keys": [
+      "srgb"
+    ],
+    "gps": false
+  },
+  {
+    "file": "transparent.png",
+    "size": [
+      600,
+      600
+    ],
+    "metadata_keys": [
+      "srgb"
+    ],
+    "gps": false
+  }
+]
