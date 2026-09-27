@@ -1,6 +1,6 @@
-node_modules/
-dist/
 .vercel/
-.env*
+node_modules/
+.env
+.env.*
 !.env.example
-test-results/
+.DS_Store
