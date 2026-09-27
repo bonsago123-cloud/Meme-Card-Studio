@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {resizeRect,validState} from '../dist/core.mjs';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const p={x:0,y:0,w:600,h:400};
+const bigger=resizeRect(p,'se',20000,30000,false);assert.equal(bigger.w,20600);assert.equal(bigger.h,30400);
+const left=resizeRect(p,'nw',-20000,-30000,false);assert.equal(left.x,-20000);assert.equal(left.y,-30000);assert.equal(left.x+left.w,600);
+const state={ratio:'1:1',background:'#ffffff',text:'',textColor:'#000000',fontSize:64,textX:50,textY:50,design:'quiet',canvasEnabled:false,photoCanvas:false,photo:{...left,src:'data:image/png;base64,iVBORw0KGgo=',sx:0,sy:0,sw:600,sh:400}};
+assert.equal(validState(state),true);
+const app=fs.readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+const normalize=app.match(/function normalizeSurface\(\)\{[^\n]+/)[0];
+vm.runInNewContext(normalize+';normalizeSurface();',{state});assert.equal(state.photo.x,-20000);
+const handler=app.match(/stage.addEventListener\('pointermove',e=>\{(.+)\}\);/)[1];
+const context={state,drag:{kind:'move',q:{x:0,y:0},p:{x:40,y:60}},point:()=>({x:15000,y:-12000}),draw:()=>{}};
+vm.runInNewContext('(function(e){'+handler+'})({});',context);assert.equal(state.photo.x,15040);assert.equal(state.photo.y,-11940);
+console.log(JSON.stringify({scope:'Geometry and actual pointermove handler evaluated with mocked coordinates; not browser QA',checks:5,result:'PASS'},null,2));

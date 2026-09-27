@@ -1,0 +1,5 @@
+{
+  "scope": "Geometry and actual pointermove handler evaluated with mocked coordinates; not browser QA",
+  "checks": 5,
+  "result": "PASS"
+}
