@@ -3,3 +3,10 @@
 .stage{background-color:#fff;background-image:linear-gradient(45deg,#e9e9ed 25%,transparent 25%),linear-gradient(-45deg,#e9e9ed 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e9e9ed 75%),linear-gradient(-45deg,transparent 75%,#e9e9ed 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}#emptyCanvas{color:#85808f;text-align:center;padding:35px}.canvas-area{overflow:hidden}button:disabled{opacity:.45;cursor:default}
 
 .view-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;color:#817b8d;font-size:11px}.view-tools button{font-size:11px;padding:6px 10px}.view-tools input{width:72px;padding:5px;border:1px solid #ddd;border-radius:5px}.view-tools span{font-size:10px}.stage{width:min(100%,540px)!important;max-width:540px!important;aspect-ratio:1!important;overflow:hidden}.stage canvas{cursor:move}.canvas-area{overflow:hidden}
+
+/* The workspace is not the exported canvas. Do not clip a free photo to it. */
+.stage{background:transparent!important;box-shadow:none}
+.stage.free-photo{overflow:visible!important}
+.canvas-area.free-workspace{overflow:visible!important}
+.stage.free-photo canvas{max-width:none;max-height:none}
+.panel,header{position:relative;z-index:2}

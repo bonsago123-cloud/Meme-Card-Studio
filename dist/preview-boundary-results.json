@@ -1,0 +1,7 @@
+{
+  "scope": "Actual draw/render functions with a recording canvas stub, not real browser visual QA",
+  "input": "600x400 photo moved to x=-200,y=100 without canvas",
+  "before": "FAIL: image drawn at negative x inside fixed bitmap and clipped",
+  "after": "PASS: full image drawn at local x=0; whole photo element positioned at negative workspace x",
+  "checks": 7
+}
