@@ -22,6 +22,15 @@
           "value": "text/javascript; charset=utf-8"
         }
       ]
+    },
+    {
+      "source": "/scene.mjs",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/javascript; charset=utf-8"
+        }
+      ]
     }
   ]
 }
