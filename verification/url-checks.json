@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-28",
+  "site": "https://meme-card-studio-phye.vercel.app/",
+  "source": "https://github.com/bonsago123-cloud/Meme-Card-Studio/commit/2b75a22c4af6fcfaa551f7702f04ad7f5219b9aa",
+  "repository_visibility": "public",
+  "scope": "Anonymous HTTP retrieval of site and runtime assets; GitHub plugin metadata and tree hashes. Not browser incognito UI testing.",
+  "runtime_files": [
+    {
+      "file": "app.js",
+      "http_status": 200,
+      "local_matches_commit": true,
+      "deployment_matches_local": true
+    },
+    {
+      "file": "core.mjs",
+      "http_status": 200,
+      "local_matches_commit": true,
+      "deployment_matches_local": true
+    },
+    {
+      "file": "scene.mjs",
+      "http_status": 200,
+      "local_matches_commit": true,
+      "deployment_matches_local": true
+    },
+    {
+      "file": "index.html",
+      "http_status": 200,
+      "local_matches_commit": true,
+      "deployment_matches_local": true
+    },
+    {
+      "file": "style.css",
+      "http_status": 200,
+      "local_matches_commit": true,
+      "deployment_matches_local": true
+    }
+  ]
+}
