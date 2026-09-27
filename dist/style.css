@@ -10,3 +10,9 @@
 .canvas-area.free-workspace{overflow:visible!important}
 .stage.free-photo canvas{max-width:none;max-height:none}
 .panel,header{position:relative;z-index:2}
+
+/* Active-canvas exterior is its own drawable element, not clipped by the viewport bitmap. */
+.stage.active-canvas{overflow:visible!important}
+.canvas-area.active-workspace{overflow:visible!important}
+#outsidePhoto{position:absolute;z-index:1;max-width:none;max-height:none;touch-action:none;cursor:move}
+.stage.active-canvas #selection{z-index:3}
